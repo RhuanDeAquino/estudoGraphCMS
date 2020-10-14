@@ -1,24 +1,50 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, { useEffect, useState } from 'react';
 import './App.css';
+import { request } from 'graphql-request';
+
+
+import Header from './screens/header';
+import Home from './screens/home';
+import Loren from './screens/loren';
+import From from './screens/from';
+import Suspendisse from './screens/Suspendisse';
 
 function App() {
+
+  const [list, setList] = useState(null);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      const { site } = await request(
+        'https://api-eu-central-1.graphcms.com/v2/ckg7zl59eoehs01z65ubm50jp/master',
+        `
+      { 
+        site(where: {id: "ckg809zso08zg0154sdp5xova"}) {
+          pagina {
+            nome
+            fragmento {
+              singleText
+              nome
+            }
+          }
+        }
+      }
+    `
+      );
+
+      setList(site);
+    };
+    fetchProducts();
+  }, []);
+
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <Header />
+      <Home fragmento={list}/>
+      <Loren fragmento={list}/>
+      <From fragmento={list}/>
+      <Suspendisse fragmento={list}/>      
     </div>
   );
 }
